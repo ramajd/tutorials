@@ -40,18 +40,77 @@ fn is_nice(word: &str) -> bool {
     !is_forbidden && vowels >= 3 && has_double
 }
 
+fn find_repeated_pair(word: &str) -> Option<String> {
+    let mut prv = ' ';
+    for (idx, c) in word.chars().enumerate() {
+        let pair = format!("{}{}", prv, c);
+        let res = word.rfind(&pair);
+
+        if let Some(pos) = res {
+            if pos > idx {
+                return Some(pair);
+            }
+        }
+        prv = c;
+    }
+    None
+}
+
+fn find_repeating_pattern(word: &str) -> Option<String> {
+    let mut pp = ' ';
+    let mut p = ' ';
+    for c in word.chars() {
+        if pp == c {
+            return Some(format!("{}{}{}", pp, p, c));
+        }
+        pp = p;
+        p = c;
+    }
+    None
+}
+
+fn is_nice_2(word: &str) -> bool {
+    find_repeated_pair(word).is_some() && find_repeating_pattern(word).is_some()
+}
+
 fn main() {
     let file = File::open("input.txt").expect("Failed to open input.txt");
     let buffer = BufReader::new(file);
 
-    let mut nice_count = 0;
+    let mut nice_count_1 = 0;
+    let mut nice_count_2 = 0;
 
     for line in buffer.lines() {
         let line = line.expect("Failed to read line");
         if is_nice(&line) {
-            nice_count += 1;
-            println!("{}", line);
+            nice_count_1 += 1;
+        }
+        if is_nice_2(&line) {
+            nice_count_2 += 1;
         }
     }
-    println!("nice count: {}", nice_count);
+    println!("nice count 1: {}", nice_count_1);
+    println!("nice count 2: {}", nice_count_2);
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{find_repeated_pair, find_repeating_pattern};
+
+    #[test]
+    fn repeated_pair() {
+        assert_eq!(find_repeated_pair("xyxy"), Some(String::from("xy")));
+        assert_eq!(find_repeated_pair("aabcdefgaa"), Some(String::from("aa")));
+        assert_eq!(find_repeated_pair("aaa"), None);
+        assert_eq!(find_repeated_pair("baaa"), None);
+        assert_eq!(find_repeated_pair("baaab"), None);
+        assert_eq!(find_repeated_pair("abaaba"), Some(String::from("ab")));
+    }
+
+    #[test]
+    fn pattern() {
+        assert_eq!(find_repeating_pattern("aa"), None);
+        assert_eq!(find_repeating_pattern("aaa"), Some(String::from("aaa")));
+        assert_eq!(find_repeating_pattern("aba"), Some(String::from("aba")));
+    }
 }
