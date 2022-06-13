@@ -24,13 +24,13 @@ impl Display for GridCommandError {
 
 #[derive(Debug)]
 pub struct Grid {
-    cells: Vec<Vec<bool>>,
+    cells: Vec<Vec<usize>>,
 }
 
 impl Grid {
     pub fn new(size: usize) -> Self {
         Self {
-            cells: vec![vec![false; size]; size],
+            cells: vec![vec![0; size]; size],
         }
     }
 
@@ -66,7 +66,7 @@ impl Grid {
                 let (start, end) = self.adjust_coordinates(&c1, &c2)?;
                 for x in start.x..=end.x {
                     for y in start.y..=end.y {
-                        self.cells[x][y] = true;
+                        self.cells[x][y] += 1;
                     }
                 }
             }
@@ -74,7 +74,9 @@ impl Grid {
                 let (start, end) = self.adjust_coordinates(&c1, &c2)?;
                 for x in start.x..=end.x {
                     for y in start.y..=end.y {
-                        self.cells[x][y] = false;
+                        if self.cells[x][y] > 0 {
+                            self.cells[x][y] -= 1;
+                        }
                     }
                 }
             }
@@ -82,7 +84,7 @@ impl Grid {
                 let (start, end) = self.adjust_coordinates(&c1, &c2)?;
                 for x in start.x..=end.x {
                     for y in start.y..=end.y {
-                        self.cells[x][y] = !self.cells[x][y];
+                        self.cells[x][y] += 2;
                     }
                 }
             }
@@ -94,8 +96,14 @@ impl Grid {
         self.cells.iter().fold(0, |acc, row| {
             acc + row
                 .iter()
-                .fold(0, |acc, cell| if *cell { acc + 1 } else { acc })
+                .fold(0, |acc, cell| if *cell > 0 { acc + 1 } else { acc })
         })
+    }
+
+    pub fn total_brightness(&self) -> usize {
+        self.cells
+            .iter()
+            .fold(0, |acc, row| acc + row.iter().sum::<usize>())
     }
 }
 

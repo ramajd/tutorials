@@ -19,4 +19,5 @@ fn main() {
     }
 
     println!("Number of lit lights: {}", grid.lit_count());
+    println!("Total brightness: {}", grid.total_brightness());
 }
