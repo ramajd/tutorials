@@ -133,4 +133,10 @@ fn main() {
     let a = results.get("a").unwrap().clone();
     println!("a = {}", a);
 
+    // Part 2: override a with wire b
+    let mut results: HashMap<String, u16> = HashMap::new();
+    results.insert("b".to_owned(), a);
+    process_wires(&wires, &mut results);
+    let a = results.get("a").unwrap().clone();
+    println!("a = {}", a);
 }
