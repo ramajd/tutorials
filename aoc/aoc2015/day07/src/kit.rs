@@ -102,15 +102,23 @@ impl Kit {
             .ok_or(KitError::new("Signal not found"))
     }
 
+    pub fn process_kit(&mut self, initial_state: &HashMap<String, u16>) {
+        self.values = initial_state.clone();
+        let mut modified: HashMap<String, u16> = HashMap::new();
+
+        for wire in &self.wires {
+            if let Some(value) = self.process_wire(wire) {
+                modified.insert(wire.title.clone(), value);
+            }
+        }
+
+        for (key, value) in modified.iter() {
+            self.update_wires(key, *value);
+        }
+    }
+
     pub fn add_instruction(&mut self, instruction: &str) {
         let wire = Wire::parse(instruction).unwrap();
-        let value = self.process_wire(&wire);
-
-        if let Some(value) = value {
-            println!("{:?}\t -> {:?}", wire, value);
-            let key = wire.title.clone();
-            self.update_wires(&key, value);
-        }
         self.wires.push(wire);
     }
 
@@ -125,7 +133,6 @@ impl Kit {
             return Some(*value);
         }
 
-        // println!("{:?}", wire);
         match wire.operator {
             Operator::ASSIGN => get_value(&wire.inputs[0]),
             Operator::NOT => get_value(&wire.inputs[0]).and_then(|v| Some(!v)),
@@ -155,18 +162,17 @@ impl Kit {
     }
 
     fn update_wires(&mut self, key: &String, value: u16) {
-        self.values.insert(key.clone(), value);
-
-        let mut modifications: HashMap<String, u16> = HashMap::new();
-
-        for wire in self.wires.iter().filter(|w| w.inputs.contains(key)) {
-            if let Some(value) = self.process_wire(wire) {
-                println!("{:?}\t -> {:?}", wire, value);
-                modifications.insert(wire.title.clone(), value);
+        if !self.values.contains_key(key) {
+            self.values.insert(key.clone(), value);
+            let mut modifications: HashMap<String, u16> = HashMap::new();
+            for wire in self.wires.iter().filter(|w| w.inputs.contains(key)) {
+                if let Some(value) = self.process_wire(wire) {
+                    modifications.insert(wire.title.clone(), value);
+                }
             }
-        }
-        for (k, v) in modifications {
-            self.update_wires(&k, v);
+            for (k, v) in modifications {
+                self.update_wires(&k, v);
+            }
         }
     }
 }

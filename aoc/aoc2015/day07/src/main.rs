@@ -1,5 +1,6 @@
 mod kit;
 
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
@@ -16,6 +17,12 @@ fn main() {
         kit.add_instruction(&line);
     }
 
+    kit.process_kit(&HashMap::new());
     let a = kit.get_signal("a").unwrap();
     println!("Signal value for 'a': {}", a);
+
+    let mut second_run = HashMap::new();
+    second_run.insert(String::from("b"), a);
+    kit.process_kit(&second_run);
+    println!("Signal value for 'a': {}", kit.get_signal("a").unwrap());
 }
