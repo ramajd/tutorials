@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
+use std::thread;
 
 type HappinessDB = HashMap<String, HashMap<String, i32>>;
 
@@ -48,13 +49,32 @@ fn main() {
 }
 
 fn find_maximum_happiness(records: &HappinessDB) -> i32 {
+    let cpu_count = num_cpus::get();
+    let mut people = records.keys();
     let mut max_happiness = std::i32::MIN;
 
-    for (p, _) in records {
-        let mut placed_list = vec![];
-        if let Some(happiness) = place_around_table(p, &mut placed_list, records) {
-            if happiness > max_happiness {
-                max_happiness = happiness;
+    loop {
+        let mut handles = Vec::new();
+        for i in 0..cpu_count {
+            if let Some(person) = people.next() {
+                let person = person.clone();
+                let records = records.clone();
+                println!("[thread {}] start processing {}", i, person);
+                let handle = thread::spawn(move || {
+                    let mut place_order = Vec::new();
+                    place_around_table(person.as_str(), &mut place_order, &records)
+                });
+                handles.push(handle);
+            }
+        }
+        if handles.len() == 0 {
+            break;
+        }
+        for handle in handles {
+            if let Some(happiness) = handle.join().unwrap() {
+                if happiness > max_happiness {
+                    max_happiness = happiness;
+                }
             }
         }
     }
