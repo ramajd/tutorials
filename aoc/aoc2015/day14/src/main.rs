@@ -19,6 +19,9 @@ fn main() {
 
     let (winner, distance) = perform_race(&records, end_time);
     println!("winner is [{}] with distance = {}", winner, distance);
+
+    let (winner, points) = perform_point_race(&records, end_time);
+    println!("winner is [{}] with points = {}", winner, points);
 }
 
 fn perform_race(records: &HashMap<String, (u32, u32, u32)>, end_time: u32) -> (String, u32) {
@@ -34,11 +37,40 @@ fn perform_race(records: &HashMap<String, (u32, u32, u32)>, end_time: u32) -> (S
     (winner, max_distance)
 }
 
+fn perform_point_race(records: &HashMap<String, (u32, u32, u32)>, end_time: u32) -> (String, u32) {
+    let mut scores: HashMap<String, u32> = HashMap::new();
+
+    for i in 1..=end_time {
+        let mut winners: Vec<String> = Vec::new();
+        let mut max_distance = 0;
+        for (deer, (speed, duration, rest)) in records {
+            let d = calculate_distance(*speed, *duration, *rest, i);
+            if d > max_distance {
+                max_distance = d;
+                winners.clear();
+                winners.push(deer.clone());
+            } else if d == max_distance {
+                winners.push(deer.clone());
+            }
+        }
+        for winner in winners {
+            scores.entry(winner).and_modify(|v| *v += 1).or_insert(1);
+        }
+    }
+
+    let res = scores
+        .iter()
+        .reduce(|ac, v| if v.1 > ac.1 { v } else { ac })
+        .unwrap();
+
+    (res.0.to_string(), *res.1)
+}
+
 fn calculate_distance(speed: u32, duration: u32, rest: u32, end_time: u32) -> u32 {
     let num_runs = end_time / (duration + rest);
     let remaining = end_time % (duration + rest);
     let total_duration = (num_runs * duration)
-        + if remaining > duration {
+        + if remaining >= duration {
             duration
         } else {
             remaining
@@ -86,5 +118,17 @@ mod tests {
         records.insert("Dancer".to_owned(), (16, 11, 162));
 
         assert_eq!(perform_race(&records, 1000), ("Comet".to_string(), 1120));
+    }
+
+    #[test]
+    fn test_race_points() {
+        let mut records: HashMap<String, (u32, u32, u32)> = HashMap::new();
+        records.insert("Comet".to_owned(), (14, 10, 127));
+        records.insert("Dancer".to_owned(), (16, 11, 162));
+
+        assert_eq!(
+            perform_point_race(&records, 1000),
+            ("Dancer".to_string(), 689)
+        );
     }
 }
