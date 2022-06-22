@@ -21,6 +21,30 @@ fn main() {
 
     let total_happiness = find_maximum_happiness(&records);
     println!("Total Happiness = {}", total_happiness);
+
+    let mut people: Vec<String> = Vec::new();
+    for person in records.keys() {
+        if !people.contains(person) {
+            people.push(person.clone());
+        }
+        for person in records[person].keys() {
+            if !people.contains(&person) {
+                people.push(person.clone());
+            }
+        }
+    }
+    for p in people {
+        records
+            .entry(String::from("ME"))
+            .or_insert(HashMap::new())
+            .insert(p.clone(), 0);
+        records
+            .entry(p)
+            .or_insert(HashMap::new())
+            .insert(String::from("ME"), 0);
+    }
+    let total_happiness = find_maximum_happiness(&records);
+    println!("Total Happiness with me = {}", total_happiness);
 }
 
 fn find_maximum_happiness(records: &HappinessDB) -> i32 {
