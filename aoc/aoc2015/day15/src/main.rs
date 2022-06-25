@@ -92,6 +92,12 @@ fn main() {
 
     let total_score = make_optimal_cookie(&ingredients, 100);
     println!("Total score for cookie = {}", total_score);
+
+    let total_score = make_optimal_cookie_with_calorie_limit(&ingredients, 100, 500);
+    println!(
+        "Total score for cookie with {} calories = {}",
+        500, total_score
+    );
 }
 
 fn parse_input(line: &str) -> Option<Ingredient> {
@@ -132,6 +138,24 @@ fn make_optimal_cookie(ingredients: &Vec<Ingredient>, total: i32) -> i32 {
     max_score.value()
 }
 
+fn make_optimal_cookie_with_calorie_limit(
+    ingredients: &Vec<Ingredient>,
+    total: i32,
+    calorie_limit: i32,
+) -> i32 {
+    let variants = generate_variants(vec![], ingredients.len(), total);
+    let mut max_score = Score::new(0, 0, 0, 0);
+
+    for variant in variants {
+        let score = calculate_score(&variant, &ingredients);
+        let calorie = calculate_calorie(&variant, &ingredients);
+        if (calorie == calorie_limit) && score > max_score {
+            max_score = score;
+        }
+    }
+    max_score.value()
+}
+
 fn generate_variants(prefix: Vec<i32>, len: usize, total: i32) -> Vec<Vec<i32>> {
     if len == 1 {
         let mut result = prefix;
@@ -153,6 +177,14 @@ fn calculate_score(variant: &Vec<i32>, ingredients: &Vec<Ingredient>) -> Score {
     let mut result = Score::new(0, 0, 0, 0);
     for (idx, amount) in variant.iter().enumerate() {
         result = result + ingredients[idx].score(*amount);
+    }
+    result
+}
+
+fn calculate_calorie(variant: &[i32], ingredients: &[Ingredient]) -> i32 {
+    let mut result = 0;
+    for (idx, amount) in variant.iter().enumerate() {
+        result += ingredients[idx].cal * *amount;
     }
     result
 }
@@ -215,4 +247,15 @@ mod tests {
         assert_eq!(make_optimal_cookie(&ingredients, 100), 62842880);
     }
 
+    #[test]
+    fn test_make_optimal_cookie_with_calorie_limit() {
+        let ingredients = vec![
+            Ingredient::new("Butterscotch", -1, -2, 6, 3, 8),
+            Ingredient::new("Cinnamon", 2, 3, -2, -1, 3),
+        ];
+        assert_eq!(
+            make_optimal_cookie_with_calorie_limit(&ingredients, 100, 500),
+            57600000
+        );
+    }
 }
