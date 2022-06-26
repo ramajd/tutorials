@@ -29,6 +29,8 @@ fn main() {
     let selected_aunt = find_aunt(&interests, &aunt_db);
     println!("Selected aunt = {}", selected_aunt);
 
+    let selected_aunt = find_aunt_with_adjusted_rules(&interests, &aunt_db);
+    println!("Selected aunt with new rules = {}", selected_aunt);
 }
 
 fn find_aunt(
@@ -40,6 +42,42 @@ fn find_aunt(
         for (interest, amount) in aunt_interests {
             if !interests.contains_key(interest) || interests[interest] != *amount {
                 rejected = true;
+            }
+        }
+        if !rejected {
+            return *aunt_no;
+        }
+    }
+    0
+}
+
+fn find_aunt_with_adjusted_rules(
+    interests: &HashMap<String, u32>,
+    aunt_db: &HashMap<usize, HashMap<String, u32>>,
+) -> usize {
+    for (aunt_no, aunt_interests) in aunt_db {
+        let mut rejected = false;
+        for (interest, amount) in aunt_interests {
+            if !interests.contains_key(interest) {
+                rejected = true;
+            } else {
+                match interest.as_str() {
+                    "cats" | "trees" => {
+                        if interests[interest] >= *amount {
+                            rejected = true;
+                        }
+                    }
+                    "pomeranians" | "goldfish" => {
+                        if interests[interest] <= *amount {
+                            rejected = true;
+                        }
+                    }
+                    _ => {
+                        if interests[interest] != *amount {
+                            rejected = true;
+                        }
+                    }
+                }
             }
         }
         if !rejected {
