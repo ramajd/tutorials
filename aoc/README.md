@@ -7,6 +7,7 @@ Implementation (Rust) of the `Advent of Code` programming challenges
     - [Day 2: Bathroom Security](https://adventofcode.com/2016/day/2)
     - [Day 3: Squares With Three Sides](https://adventofcode.com/2016/day/3)
     - [Day 4: Security Through Obscurity](https://adventofcode.com/2016/day/4)
+    - [Day 5: How About a Nice Game of Chess?](https://adventofcode.com/2016/day/5)
 - [Advent of Code 2015](https://adventofcode.com/2015)
     - [Day 1: Not Quite Lisp](https://adventofcode.com/2015/day/1)
     - [Day 2: I Was Told There Would Be No Math](https://adventofcode.com/2015/day/2)
