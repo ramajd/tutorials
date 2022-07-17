@@ -10,6 +10,7 @@ Implementation (Rust) of the `Advent of Code` programming challenges
     - [Day 5: How About a Nice Game of Chess?](https://adventofcode.com/2016/day/5)
     - [Day 6: Signals and Noise](https://adventofcode.com/2016/day/6)
     - [Day 7: Internet Protocol Version 7](https://adventofcode.com/2016/day/7)
+    - [Day 8: Two-Factor Authentication](https://adventofcode.com/2016/day/8)
 - [Advent of Code 2015](https://adventofcode.com/2015)
     - [Day 1: Not Quite Lisp](https://adventofcode.com/2015/day/1)
     - [Day 2: I Was Told There Would Be No Math](https://adventofcode.com/2015/day/2)
