@@ -3,6 +3,7 @@
 Implementation (Rust) of the `Advent of Code` programming challenges
 - [Advent of Code 2023](https://adventofcode.com/2023)
     - [Day 1: Day 1: Trebuchet?!](https://adventofcode.com/2023/day/1)
+    - [Day 2: Cube Conundrum](https://adventofcode.com/2023/day/2)
 - [Advent of Code 2016](https://adventofcode.com/2016)
     - [Day 1: No Time for a Taxicab](https://adventofcode.com/2016/day/1)
     - [Day 2: Bathroom Security](https://adventofcode.com/2016/day/2)
